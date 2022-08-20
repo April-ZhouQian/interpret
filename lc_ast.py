@@ -10,11 +10,6 @@ class Call:
     arg: LC
 
 @dataclass(frozen=True)
-class Func:
-    name: str
-    body: Block
-
-@dataclass(frozen=True)
 class NamedFunc:
     name: str
     arg: str
