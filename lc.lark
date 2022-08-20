@@ -1,0 +1,32 @@
+   
+                    
+                         
+                       
+              
+  
+start : lc -> start_0                 
+lc  : lc atom -> lc_0                               
+    | atom -> lc_1                     
+
+stmts : lc [";"] -> stmts_0                         
+       | stmts lc [";"] -> stmts_1                                          
+
+atom: CNAME -> atom_0                                
+    | NUMBER -> atom_1                                            
+    | "true" -> atom_2                                
+    | "false" -> atom_3                                 
+    | "func" "(" CNAME ")" "{" stmts "}" -> atom_4                                                                      
+    | ESCAPED_STRING -> atom_5                                                 
+    | "(" lc ")" -> atom_6                       
+    | CNAME "=" lc -> atom_7                                             
+    | "{" stmts "}" -> atom_8                                 
+    | "if" "(" lc ")" "{" stmts "}" -> atom_9                                                                         
+    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> atom_10                                                                                        
+    | "while" "(" lc ")" "{" stmts "}" -> atom_11                                                                    
+    | "return" lc -> atom_12                                     
+    | "func" CNAME "(" CNAME ")" "{" stmts "}" -> atom_13                                                                                           
+%import common.WS
+%import common.ESCAPED_STRING
+%import common.CNAME
+%import common.NUMBER
+%ignore WS
