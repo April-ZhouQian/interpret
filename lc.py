@@ -37,7 +37,7 @@ class lc_Transformer(Transformer):
     def atom_3(self, __args):
         return  BoolVal(False)
     def atom_4(self, __args):
-        return  Func(__args[3-1].value, Block(__args[6-1]))
+        return  NamedFunc("", __args[3-1].value, Block(__args[6-1]))
     def atom_5(self, __args):
         return StringVal(eval(__args[1-1].value))
     def atom_6(self, __args):

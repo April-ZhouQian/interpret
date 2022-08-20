@@ -15,7 +15,7 @@ atom: CNAME -> atom_0
     | NUMBER -> atom_1                                            
     | "true" -> atom_2                                
     | "false" -> atom_3                                 
-    | "func" "(" CNAME ")" "{" stmts "}" -> atom_4                                                                      
+    | "func" "(" CNAME ")" "{" stmts "}" -> atom_4                                                                               
     | ESCAPED_STRING -> atom_5                                                 
     | "(" lc ")" -> atom_6                       
     | CNAME "=" lc -> atom_7                                             

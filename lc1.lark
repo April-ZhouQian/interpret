@@ -15,7 +15,7 @@ atom: CNAME    -> Var($1.value)
     | NUMBER   -> NumberVal(eval($1.value))
     | "true"   -> BoolVal(True)
     | "false"  -> BoolVal(False)
-    | "func" "(" CNAME ")" "{" stmts "}" -> Func($3.value, Block($6))
+    | "func" "(" CNAME ")" "{" stmts "}" -> NamedFunc("", $3.value, Block($6))
     | ESCAPED_STRING ->StringVal(eval($1.value))
     | "(" lc ")" -> $2
     | CNAME "=" lc ->AssignVal($1.value, $3)

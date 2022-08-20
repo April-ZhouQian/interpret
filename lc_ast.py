@@ -61,9 +61,9 @@ class ReturnBlock:
     body: LC
 
 if typing.TYPE_CHECKING:
-    LC = Var | Func | Call | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | ReturnBlock # type: ignore
+    LC = Var | Call | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | ReturnBlock # type: ignore
 else:
-    LC = (Var, Func, Call, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, ReturnBlock)
+    LC = (Var, Call, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, ReturnBlock)
 
 @dataclass
 class State:
@@ -84,13 +84,16 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         r1, S2 = eval_lc(S1, syntactic_structure.arg)
         r2, S3 = rf(S2, r1)
         return r2, S3
-    elif isinstance(syntactic_structure,Func):
+    elif isinstance(syntactic_structure, NamedFunc):
         def rf(S_star: State, r_star):
-            a = syntactic_structure.name
-            S1 = State({**S.scope, a: r_star})
+            arg = syntactic_structure.arg
+            S1 = State({**S.scope, arg: r_star})
             r1 = None
             r1, S1 = eval_lc(S1, syntactic_structure.body)
             return r1, S_star
+        name = syntactic_structure.name
+        if name != '':
+            S = State({**S.scope, name: rf})
         return rf, S
     elif isinstance(syntactic_structure, AssignVal):
         value = eval_lc(S, syntactic_structure.value)[0]
@@ -104,16 +107,6 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
             else:
                 break
         return r, S
-    elif isinstance(syntactic_structure, NamedFunc):
-        def rf(S_star: State, r_star):
-            arg = syntactic_structure.arg
-            S1 = State({**S.scope, arg: r_star})
-            r1 = None
-            r1, S1 = eval_lc(S1, item)
-            return r1, S_star
-        name = syntactic_structure.name
-        S = State({**S.scope, name: rf})
-        return rf, S
     elif isinstance(syntactic_structure, IfBlock):
         r = eval_lc(S,syntactic_structure.cond)[0]
         r1 = None
