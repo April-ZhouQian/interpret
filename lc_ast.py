@@ -5,14 +5,9 @@ import typing
 import typing_extensions
 
 @dataclass(frozen=True)
-class Call:
-    func: LC
-    arg: LC
-
-@dataclass(frozen=True)
 class NamedFunc:
     name: str
-    arg: str
+    arg: list[str]
     body: Block
 
 @dataclass(frozen=True)
@@ -55,10 +50,26 @@ class WhileBlock:
 class Return:
     body: LC
 
+@dataclass(frozen=True)
+class CallFunc:
+    func: LC
+    arg: list[LC]
+
+@dataclass(frozen=True)
+class BinOp:
+    left: LC
+    right: LC
+    op: LC
+
+@dataclass(frozen=True)
+class UnaryOp:
+    right: LC
+    op: str
+
 if typing.TYPE_CHECKING:
-    LC = Var | Call | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return # type: ignore
+    LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp # type: ignore
 else:
-    LC = (Var, Call, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, Return)
+    LC = (Var, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, Return, CallFunc, BinOp, UnaryOp)
 
 @dataclass
 class State:
@@ -74,18 +85,21 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         return syntactic_structure.value, S
     elif isinstance(syntactic_structure, NumberVal):
         return syntactic_structure.value, S
-    elif isinstance(syntactic_structure, Call):
-        rf, S1 = eval_lc(S, syntactic_structure.func)
-        r1, S2 = eval_lc(S1, syntactic_structure.arg)
-        r2, S3 = rf(S2, r1)
-        return r2, S3
     elif isinstance(syntactic_structure, NamedFunc):
         def rf(S_star: State, r_star):
             arg = syntactic_structure.arg
-            S1 = State({**S.scope, arg: r_star}, S.is_returning)
+            S1 = State({**S.scope}, S.is_returning)
             r1 = None
-            r1, S1 = eval_lc(S1, syntactic_structure.body)
-            return r1, S_star
+            gap = len(r_star) - len(arg)
+            if gap > 0:
+                raise Exception("Error in parameter list: " + str(gap) + " more parameters were transmitted")
+            elif gap < 0:
+                raise Exception("Error in parameter list: Missing " + str(-gap) + " parameters")
+            else:
+                for index in range(len(arg)):
+                    S1 = State({**S1.scope, arg[index]: r_star[index]}, S1.is_returning)
+                r1, S1 = eval_lc(S1, syntactic_structure.body)
+                return r1, S_star
         name = syntactic_structure.name
         if name != '':
             S = State({**S.scope, name: rf}, S.is_returning)
@@ -121,6 +135,31 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         r, S = eval_lc(S, syntactic_structure.body)
         S_New = State({**S.scope}, True)
         return r, S_New
+    elif isinstance(syntactic_structure, CallFunc):
+        rf, S1 = eval_lc(S, syntactic_structure.func)
+        arg = syntactic_structure.arg
+        r = []
+        S2 = State({**S1.scope}, S1.is_returning)
+        for index in range(len(arg)):
+            r1, S2 = eval_lc(S1, arg[index])
+            r.append(r1)
+        r2, S3 = rf(S2, r)
+        return r2, S3
+    elif isinstance(syntactic_structure, BinOp):
+        arg = []
+        left, S = eval_lc(S, syntactic_structure.left)
+        arg.append(left)
+        right, S = eval_lc(S, syntactic_structure.right)
+        arg.append(right)
+        rf, S1 = eval_lc(S, syntactic_structure.op)
+        r, S2 = rf(S1, arg)
+        return r, S2
+    elif isinstance(syntactic_structure, UnaryOp):
+        left, S = eval_lc(S, syntactic_structure.right)
+        if syntactic_structure.op == "pos":
+            return left, S
+        else:
+            return -left, S
     if typing.TYPE_CHECKING:
         typing_extensions.assert_never(syntactic_structure)
     else:

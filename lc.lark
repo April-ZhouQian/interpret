@@ -5,26 +5,50 @@
               
   
 start : lc -> start_0                 
-lc  : lc atom -> lc_0                               
-    | atom -> lc_1                     
+lc  : lc "(" actual_params ")" -> lc_0                                                   
+    | lc "(" ")" -> lc_1                                     
+    | addsub -> lc_2                   
+    | "+" lc -> lc_3                                   
+    | "-" lc -> lc_4                                   
+    | lc ">" lc -> lc_5                                            
+    | lc "<" lc -> lc_6                                            
+    | CNAME "=" lc -> lc_7                                             
+    | "func" "(" args ")" "{" stmts "}" -> lc_8                                                                        
+    | "func" "(" ")" "{" stmts "}" -> lc_9                                                                   
+    | "if" "(" lc ")" "{" stmts "}" -> lc_10                                                                         
+    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> lc_11                                                                                        
+    | "while" "(" lc ")" "{" stmts "}" -> lc_12                                                                    
+    | "return" lc -> lc_13                                
+    | "func" CNAME "(" args ")" "{" stmts "}" -> lc_14                                                                                    
+    | "func" CNAME "(" ")" "{" stmts "}" -> lc_15                                                                               
 
 stmts : lc [";"] -> stmts_0                         
        | stmts lc [";"] -> stmts_1                                          
+
+name : CNAME -> name_0                         
+
+args :  name -> args_0                      
+       | args "," name -> args_1                                          
+
+actual_params: atom -> actual_params_0                            
+             | actual_params "," atom -> actual_params_1                                                        
+
+addsub: muldiv -> addsub_0                     
+        | addsub "+" muldiv -> addsub_1                                                         
+        | addsub "-" muldiv -> addsub_2                                                         
+
+muldiv: atom -> muldiv_0                   
+        | muldiv "*" atom -> muldiv_1                                                       
+        | muldiv "/" atom -> muldiv_2                                                       
+        | muldiv "%" atom -> muldiv_3                                                       
 
 atom: CNAME -> atom_0                                
     | NUMBER -> atom_1                                            
     | "true" -> atom_2                                
     | "false" -> atom_3                                 
-    | "func" "(" CNAME ")" "{" stmts "}" -> atom_4                                                                               
-    | ESCAPED_STRING -> atom_5                                                 
-    | "(" lc ")" -> atom_6                       
-    | CNAME "=" lc -> atom_7                                             
-    | "{" stmts "}" -> atom_8                                 
-    | "if" "(" lc ")" "{" stmts "}" -> atom_9                                                                         
-    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> atom_10                                                                                        
-    | "while" "(" lc ")" "{" stmts "}" -> atom_11                                                                    
-    | "return" lc -> atom_12                                
-    | "func" CNAME "(" CNAME ")" "{" stmts "}" -> atom_13                                                                                           
+    | ESCAPED_STRING -> atom_4                                                  
+    | "(" lc ")" -> atom_5                       
+    | "{" stmts "}" -> atom_6                                 
 %import common.WS
 %import common.ESCAPED_STRING
 %import common.CNAME
