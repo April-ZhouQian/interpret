@@ -103,7 +103,7 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
                 break
         return r, S
     elif isinstance(syntactic_structure, IfBlock):
-        r = eval_lc(S,syntactic_structure.cond)[0]
+        r, S = eval_lc(S, syntactic_structure.cond)
         r1 = None
         if r:
             r1, S = eval_lc(S, syntactic_structure.body)
@@ -111,10 +111,12 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
             r1, S = eval_lc(S, syntactic_structure.else_body)
         return r1, S
     elif isinstance(syntactic_structure, WhileBlock):
-        r = None
-        while(eval_lc(S,syntactic_structure.cond)[0]):
-            r, S = eval_lc(S, syntactic_structure.body)
-        return r, S
+        r1 = None
+        r, S = eval_lc(S,syntactic_structure.cond)
+        while(r):
+            r1, S = eval_lc(S, syntactic_structure.body)
+            r, S = eval_lc(S, syntactic_structure.cond)
+        return r1, S
     elif isinstance(syntactic_structure, Return):
         r, S = eval_lc(S, syntactic_structure.body)
         S_New = State({**S.scope}, True)
