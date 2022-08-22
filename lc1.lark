@@ -23,7 +23,7 @@ atom: CNAME    -> Var($1.value)
     | "if" "(" lc ")" "{" stmts "}" -> IfBlock($3, Block($6), Block([]))
     | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> IfBlock($3, Block($6), $10)
     | "while" "(" lc ")" "{" stmts "}" -> WhileBlock($3, Block($6))
-    | "return" lc -> ReturnBlock($2)
+    | "return" lc -> Return($2)
     | "func" CNAME "(" CNAME ")" "{" stmts "}" -> NamedFunc($2.value, $4.value, Block($7))
 %import common.WS
 %import common.ESCAPED_STRING

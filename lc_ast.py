@@ -52,18 +52,18 @@ class WhileBlock:
     body: Block
 
 @dataclass(frozen=True)
-class ReturnBlock:
+class Return:
     body: LC
 
 if typing.TYPE_CHECKING:
-    LC = Var | Call | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | ReturnBlock # type: ignore
+    LC = Var | Call | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return # type: ignore
 else:
-    LC = (Var, Call, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, ReturnBlock)
+    LC = (Var, Call, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, Return)
 
 @dataclass
 class State:
     scope:typing.Dict[str, typing.Any]
-    is_returnning: bool = False
+    is_returning: bool
 
 def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
     if isinstance(syntactic_structure, Var):
@@ -82,22 +82,22 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
     elif isinstance(syntactic_structure, NamedFunc):
         def rf(S_star: State, r_star):
             arg = syntactic_structure.arg
-            S1 = State({**S.scope, arg: r_star})
+            S1 = State({**S.scope, arg: r_star}, S.is_returning)
             r1 = None
             r1, S1 = eval_lc(S1, syntactic_structure.body)
             return r1, S_star
         name = syntactic_structure.name
         if name != '':
-            S = State({**S.scope, name: rf})
+            S = State({**S.scope, name: rf}, S.is_returning)
         return rf, S
     elif isinstance(syntactic_structure, AssignVal):
         value = eval_lc(S, syntactic_structure.value)[0]
-        S_New = State({**S.scope, syntactic_structure.var: value})
+        S_New = State({**S.scope, syntactic_structure.var: value}, S.is_returning)
         return value, S_New
     elif isinstance(syntactic_structure, Block):
         r = None
         for item in syntactic_structure.body:
-            if S.is_returnning == False:
+            if S.is_returning == False:
                 r, S = eval_lc(S, item)
             else:
                 break
@@ -115,10 +115,10 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         while(eval_lc(S,syntactic_structure.cond)[0]):
             r, S = eval_lc(S, syntactic_structure.body)
         return r, S
-    elif isinstance(syntactic_structure, ReturnBlock):
+    elif isinstance(syntactic_structure, Return):
         r, S = eval_lc(S, syntactic_structure.body)
-        S.is_returnning = True
-        return r, S
+        S_New = State({**S.scope}, True)
+        return r, S_New
     if typing.TYPE_CHECKING:
         typing_extensions.assert_never(syntactic_structure)
     else:

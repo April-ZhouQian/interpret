@@ -53,7 +53,7 @@ class lc_Transformer(Transformer):
     def atom_11(self, __args):
         return  WhileBlock(__args[3-1], Block(__args[6-1]))
     def atom_12(self, __args):
-        return  ReturnBlock(__args[2-1])
+        return  Return(__args[2-1])
     def atom_13(self, __args):
         return  NamedFunc(__args[2-1].value, __args[4-1].value, Block(__args[7-1]))
 

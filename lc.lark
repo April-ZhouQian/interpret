@@ -23,7 +23,7 @@ atom: CNAME -> atom_0
     | "if" "(" lc ")" "{" stmts "}" -> atom_9                                                                         
     | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> atom_10                                                                                        
     | "while" "(" lc ")" "{" stmts "}" -> atom_11                                                                    
-    | "return" lc -> atom_12                                     
+    | "return" lc -> atom_12                                
     | "func" CNAME "(" CNAME ")" "{" stmts "}" -> atom_13                                                                                           
 %import common.WS
 %import common.ESCAPED_STRING

@@ -17,7 +17,7 @@ def add(S, x):
 
 S = State(
     {"add": add, "sub": sub, "lt": lt},
-    is_returnning = False
+    is_returning = False
 )
 def run_code(source_code):
     ast = parser.parse(source_code)
