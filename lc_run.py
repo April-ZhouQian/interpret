@@ -1,9 +1,8 @@
 from cProfile import run
+import re
 from lc import parser
 from lc_ast import *
 
-def lt(S, x):
-    return x[0] < x[1], S
 def sub(S, x):
     return x[0]- x[1], S
 def add(S, x):
@@ -14,10 +13,18 @@ def mul(S, x):
     return x[0] * x[1], S
 def mod(S, x):
     return x[0] % x[1], S
+def lt(S, x):
+    return x[0] < x[1], S
 def gt(S, x):
     return x[0] > x[1], S
+def ge(S, x):
+    return x[0] >= x[1], S
+def le(S, x):
+    return x[0] <= x[1], S
+def eq(S, x):
+    return x[0] == x[1], S
 S = State(
-    {"add": add, "sub": sub, "lt": lt, "gt": gt, "div": div, "mul": mul, "mod": mod},
+    {"add": add, "sub": sub, "lt": lt, "gt": gt, "ge": ge, "le": le, "eq": eq, "div": div, "mul": mul, "mod": mod},
     is_returning = False
 )
 def run_code(source_code):

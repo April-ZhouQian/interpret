@@ -27,30 +27,22 @@ class lc_Transformer(Transformer):
     def lc_2(self, __args):
         return  __args[1-1]
     def lc_3(self, __args):
-        return  UnaryOp(__args[2-1], "pos")
-    def lc_4(self, __args):
-        return  UnaryOp(__args[2-1], "neg")
-    def lc_5(self, __args):
-        return  BinOp(__args[1-1], __args[3-1], Var("gt"))
-    def lc_6(self, __args):
-        return  BinOp(__args[1-1], __args[3-1], Var("lt"))
-    def lc_7(self, __args):
         return AssignVal(__args[1-1].value, __args[3-1])
-    def lc_8(self, __args):
+    def lc_4(self, __args):
         return  NamedFunc("", __args[3-1], Block(__args[6-1]))
-    def lc_9(self, __args):
+    def lc_5(self, __args):
         return  NamedFunc("", [], Block(__args[5-1]))
-    def lc_10(self, __args):
+    def lc_6(self, __args):
         return  IfBlock(__args[3-1], Block(__args[6-1]), Block([]))
-    def lc_11(self, __args):
+    def lc_7(self, __args):
         return  IfBlock(__args[3-1], Block(__args[6-1]), __args[10-1])
-    def lc_12(self, __args):
+    def lc_8(self, __args):
         return  WhileBlock(__args[3-1], Block(__args[6-1]))
-    def lc_13(self, __args):
+    def lc_9(self, __args):
         return  Return(__args[2-1])
-    def lc_14(self, __args):
+    def lc_10(self, __args):
         return  NamedFunc(__args[2-1].value, __args[4-1], Block(__args[7-1]))
-    def lc_15(self, __args):
+    def lc_11(self, __args):
         return  NamedFunc(__args[2-1].value, [], Block(__args[6-1]))
     def stmts_0(self, __args):
         return  [__args[1-1]]
@@ -66,6 +58,18 @@ class lc_Transformer(Transformer):
         return  [__args[1-1]]
     def actual_params_1(self, __args):
         return  append(__args[1-1], __args[3-1])
+    def relation_0(self, __args):
+        return  __args[1-1]
+    def relation_1(self, __args):
+        return  BinOp(__args[1-1], __args[3-1], Var("gt"))
+    def relation_2(self, __args):
+        return  BinOp(__args[1-1], __args[3-1], Var("lt"))
+    def relation_3(self, __args):
+        return  BinOp(__args[1-1], __args[3-1], Var("ge"))
+    def relation_4(self, __args):
+        return  BinOp(__args[1-1], __args[3-1], Var("le"))
+    def relation_5(self, __args):
+        return  BinOp(__args[1-1], __args[3-1], Var("eq"))
     def addsub_0(self, __args):
         return  __args[1-1]
     def addsub_1(self, __args):
@@ -80,6 +84,12 @@ class lc_Transformer(Transformer):
         return  BinOp(__args[1-1], __args[3-1], Var("div"))
     def muldiv_3(self, __args):
         return  BinOp(__args[1-1], __args[3-1], Var("mod"))
+    def unary_0(self, __args):
+        return  __args[1-1]
+    def unary_1(self, __args):
+        return  UnaryOp(__args[2-1], "pos")
+    def unary_2(self, __args):
+        return  UnaryOp(__args[2-1], "neg")
     def atom_0(self, __args):
         return  Var(__args[1-1].value)
     def atom_1(self, __args):

@@ -7,20 +7,16 @@
 start : lc -> start_0                 
 lc  : lc "(" actual_params ")" -> lc_0                                                   
     | lc "(" ")" -> lc_1                                     
-    | addsub -> lc_2                   
-    | "+" lc -> lc_3                                   
-    | "-" lc -> lc_4                                   
-    | lc ">" lc -> lc_5                                            
-    | lc "<" lc -> lc_6                                            
-    | CNAME "=" lc -> lc_7                                             
-    | "func" "(" args ")" "{" stmts "}" -> lc_8                                                                        
-    | "func" "(" ")" "{" stmts "}" -> lc_9                                                                   
-    | "if" "(" lc ")" "{" stmts "}" -> lc_10                                                                         
-    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> lc_11                                                                                        
-    | "while" "(" lc ")" "{" stmts "}" -> lc_12                                                                    
-    | "return" lc -> lc_13                                
-    | "func" CNAME "(" args ")" "{" stmts "}" -> lc_14                                                                                    
-    | "func" CNAME "(" ")" "{" stmts "}" -> lc_15                                                                               
+    | relation -> lc_2                     
+    | CNAME "=" lc -> lc_3                                             
+    | "func" "(" args ")" "{" stmts "}" -> lc_4                                                                        
+    | "func" "(" ")" "{" stmts "}" -> lc_5                                                                   
+    | "if" "(" lc ")" "{" stmts "}" -> lc_6                                                                         
+    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> lc_7                                                                                        
+    | "while" "(" lc ")" "{" stmts "}" -> lc_8                                                                    
+    | "return" lc -> lc_9                                
+    | "func" CNAME "(" args ")" "{" stmts "}" -> lc_10                                                                                    
+    | "func" CNAME "(" ")" "{" stmts "}" -> lc_11                                                                               
 
 stmts : lc [";"] -> stmts_0                         
        | stmts lc [";"] -> stmts_1                                          
@@ -33,14 +29,25 @@ args :  name -> args_0
 actual_params: atom -> actual_params_0                            
              | actual_params "," atom -> actual_params_1                                                        
 
+relation: addsub -> relation_0                       
+          | relation ">" addsub -> relation_1                                                            
+          | relation "<" addsub -> relation_2                                                            
+          | relation ">=" addsub -> relation_3                                                             
+          | relation "<=" addsub -> relation_4                                                             
+          | relation "==" addsub -> relation_5                                                             
+
 addsub: muldiv -> addsub_0                     
         | addsub "+" muldiv -> addsub_1                                                         
         | addsub "-" muldiv -> addsub_2                                                         
 
-muldiv: atom -> muldiv_0                   
-        | muldiv "*" atom -> muldiv_1                                                       
-        | muldiv "/" atom -> muldiv_2                                                       
-        | muldiv "%" atom -> muldiv_3                                                       
+muldiv: unary -> muldiv_0                    
+        | muldiv "*" unary -> muldiv_1                                                        
+        | muldiv "/" unary -> muldiv_2                                                        
+        | muldiv "%" unary -> muldiv_3                                                        
+
+unary: atom -> unary_0                  
+      | "+" unary -> unary_1                                        
+      | "-" unary -> unary_2                                        
 
 atom: CNAME -> atom_0                                
     | NUMBER -> atom_1                                            

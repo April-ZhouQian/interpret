@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from numbers import Number
+from turtle import pos
 import typing
 import typing_extensions
 
@@ -64,7 +65,7 @@ class BinOp:
 @dataclass(frozen=True)
 class UnaryOp:
     right: LC
-    op: str
+    op: typing.Literal['neg', 'pos']
 
 if typing.TYPE_CHECKING:
     LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp # type: ignore
@@ -158,8 +159,9 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         left, S = eval_lc(S, syntactic_structure.right)
         if syntactic_structure.op == "pos":
             return left, S
-        else:
+        elif syntactic_structure.op == "neg":
             return -left, S
+        typing_extensions.assert_never(syntactic_structure.op)
     if typing.TYPE_CHECKING:
         typing_extensions.assert_never(syntactic_structure)
     else:
