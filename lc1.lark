@@ -7,7 +7,7 @@ def append(lst, element):
 start : lc -> $1
 lc  : lc "(" actual_params ")" -> CallFunc($1, $3)
     | lc "(" ")" -> CallFunc($1, "")
-    | relation -> $1
+    | or -> $1
     | CNAME "=" lc ->AssignVal($1.value, $3)
     | "func" "(" args ")" "{" stmts "}" -> NamedFunc("", $3, Block($6))
     | "func" "(" ")" "{" stmts "}" -> NamedFunc("", [], Block($5))
@@ -28,6 +28,15 @@ args :  name  -> [$1]
 
 actual_params: atom -> [$1]
              | actual_params "," atom -> append($1, $3)
+
+or: and -> $1
+    | or "||" and -> LogicalOp($1, $3, Var("or"))
+
+and: not -> $1
+    | and "&&" not -> LogicalOp($1, $3, Var("and"))
+
+not: relation -> $1
+    | "!" not -> LogicalNot($2, Var("not"))
 
 relation: addsub -> $1
           | relation ">" addsub -> BinOp($1, $3, Var("gt"))

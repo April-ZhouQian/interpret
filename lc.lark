@@ -7,7 +7,7 @@
 start : lc -> start_0                 
 lc  : lc "(" actual_params ")" -> lc_0                                                   
     | lc "(" ")" -> lc_1                                     
-    | relation -> lc_2                     
+    | or -> lc_2               
     | CNAME "=" lc -> lc_3                                             
     | "func" "(" args ")" "{" stmts "}" -> lc_4                                                                        
     | "func" "(" ")" "{" stmts "}" -> lc_5                                                                   
@@ -28,6 +28,15 @@ args :  name -> args_0
 
 actual_params: atom -> actual_params_0                            
              | actual_params "," atom -> actual_params_1                                                        
+
+or: and -> or_0              
+    | or "||" and -> or_1                                                  
+
+and: not -> and_0               
+    | and "&&" not -> and_1                                                    
+
+not: relation -> not_0                    
+    | "!" not -> not_1                                            
 
 relation: addsub -> relation_0                       
           | relation ">" addsub -> relation_1                                                            

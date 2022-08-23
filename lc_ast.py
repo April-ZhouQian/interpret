@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from numbers import Number
-from turtle import pos
 import typing
 import typing_extensions
 
@@ -65,12 +64,23 @@ class BinOp:
 @dataclass(frozen=True)
 class UnaryOp:
     right: LC
-    op: typing.Literal['neg', 'pos']
+    op: typing.Literal['neg', 'pos', 'not']
+
+@dataclass(frozen=True)
+class LogicalOp:
+    left: LC
+    right: LC
+    op: LC
+
+@dataclass(frozen=True)
+class LogicalNot:
+    right: LC
+    op: LC
 
 if typing.TYPE_CHECKING:
-    LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp # type: ignore
+    LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp | LogicalOp | LogicalNot # type: ignore
 else:
-    LC = (Var, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, Return, CallFunc, BinOp, UnaryOp)
+    LC = (Var, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, Return, CallFunc, BinOp, UnaryOp, LogicalOp, LogicalNot)
 
 @dataclass
 class State:
@@ -156,12 +166,28 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         r, S2 = rf(S1, arg)
         return r, S2
     elif isinstance(syntactic_structure, UnaryOp):
-        left, S = eval_lc(S, syntactic_structure.right)
+        right, S = eval_lc(S, syntactic_structure.right)
         if syntactic_structure.op == "pos":
-            return left, S
+            return right, S
         elif syntactic_structure.op == "neg":
-            return -left, S
+            return -right, S
+        elif syntactic_structure.op == "not":
+            return not right, S
         typing_extensions.assert_never(syntactic_structure.op)
+    elif isinstance(syntactic_structure, LogicalOp):
+        args = []
+        left, S =eval_lc(S, syntactic_structure.left)
+        args.append(left)
+        right, S = eval_lc(S, syntactic_structure.right)
+        args.append(right)
+        rf, S1 = eval_lc(S, syntactic_structure.op)
+        r, S2 = rf(S1, args)
+        return r, S2
+    elif isinstance(syntactic_structure, LogicalNot):
+        right, S = eval_lc(S, syntactic_structure.right)
+        rf, S1 = eval_lc(S, syntactic_structure.op)
+        r, S2 = rf(S1, right)
+        return r, S2
     if typing.TYPE_CHECKING:
         typing_extensions.assert_never(syntactic_structure)
     else:

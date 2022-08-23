@@ -2,29 +2,10 @@ from cProfile import run
 import re
 from lc import parser
 from lc_ast import *
+from intrinsic_function import *
 
-def sub(S, x):
-    return x[0]- x[1], S
-def add(S, x):
-    return x[0] + x[1], S
-def div(S, x):
-    return x[0] / x[1], S
-def mul(S, x):
-    return x[0] * x[1], S
-def mod(S, x):
-    return x[0] % x[1], S
-def lt(S, x):
-    return x[0] < x[1], S
-def gt(S, x):
-    return x[0] > x[1], S
-def ge(S, x):
-    return x[0] >= x[1], S
-def le(S, x):
-    return x[0] <= x[1], S
-def eq(S, x):
-    return x[0] == x[1], S
 S = State(
-    {"add": add, "sub": sub, "lt": lt, "gt": gt, "ge": ge, "le": le, "eq": eq, "div": div, "mul": mul, "mod": mod},
+    {"or": logic_or, "and": logic_and, "not": logic_not, "add": add, "sub": sub, "lt": lt, "gt": gt, "ge": ge, "le": le, "eq": eq, "div": div, "mul": mul, "mod": mod},
     is_returning = False
 )
 def run_code(source_code):
@@ -36,6 +17,12 @@ def run_state(S, source_code):
     r, S = eval_lc(S, ast)
     print("执行结果：", r)
     return S
+
+run_code("""
+{
+    1 + 2 && 2
+}
+""")
 
 run_code("""
 {
