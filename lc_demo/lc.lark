@@ -9,14 +9,14 @@ lc  : lc "(" actual_params ")" -> lc_0
     | lc "(" ")" -> lc_1                                     
     | or -> lc_2               
     | CNAME "=" lc -> lc_3                                             
-    | "func" "(" args ")" "{" stmts "}" -> lc_4                                                                        
-    | "func" "(" ")" "{" stmts "}" -> lc_5                                                                   
+    | "function" "(" args ")" "{" stmts "}" -> lc_4                                                                            
+    | "function" "(" ")" "{" stmts "}" -> lc_5                                                                       
     | "if" "(" lc ")" "{" stmts "}" -> lc_6                                                                         
     | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> lc_7                                                                                        
     | "while" "(" lc ")" "{" stmts "}" -> lc_8                                                                    
     | "return" lc -> lc_9                                
-    | "func" CNAME "(" args ")" "{" stmts "}" -> lc_10                                                                                    
-    | "func" CNAME "(" ")" "{" stmts "}" -> lc_11                                                                               
+    | "function" CNAME "(" args ")" "{" stmts "}" -> lc_10                                                                                        
+    | "function" CNAME "(" ")" "{" stmts "}" -> lc_11                                                                                   
 
 stmts : lc [";"] -> stmts_0                         
        | stmts lc [";"] -> stmts_1                                          

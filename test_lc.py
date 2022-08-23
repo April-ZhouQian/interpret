@@ -1,6 +1,15 @@
 from lc_demo.lc_ast import *
 from lc_demo.lc import parser
 from lc_demo.intrinsic_function import *
+from prompt_toolkit import prompt
+from prompt_toolkit.lexers import PygmentsLexer
+from pygments.lexers.matlab import MatlabLexer
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion import WordCompleter
+
+lc_completer = WordCompleter([
+    'if', 'else', 'while', 'return','function'], ignore_case=True)
 
 S = State(
     {"or": logic_or, "and": logic_and, "not": logic_not, "add": add, "sub": sub, "lt": lt, "gt": gt, "ge": ge, "le": le, "eq": eq, "div": div, "mul": mul, "mod": mod},
@@ -16,50 +25,15 @@ def run_state(S, source_code):
     print("执行结果：", r)
     return S
 
-run_code("""
-{
-    1 + 2 && 2
-}
-""")
-
-run_code("""
-{
-func myfunc()
-{
-    y = add(1,2);
-    return 7;
-}
-y = myfunc();
-}
-""")
-
-run_code("9 * 4 /2 + 2")
-run_code("""
-if(lt(1,2))
-{
-    a = 3;
-    b = 4;
-    add(a,b);
-}
-else
-{
-    a = 10;
-}
-"""
-)
-
-run_code("""
-{
-    a = 10;
-    b = 1;
-    while(lt(a, 11))
-    {
-        a = add(a, 1);
-        b = add(b, 1);
-    }
-}
-"""
-)
 S_ = S
+
+def prompt_continuation(width, line_number, is_soft_wrap):
+    return '.' * width
+
+session = PromptSession(lexer = PygmentsLexer(MatlabLexer))
+text =""
 while True:
-    S_ = run_state(S_, input("输入LC表达式> "))
+    text = session.prompt('mi>>>> ', multiline=True,
+       prompt_continuation = prompt_continuation, auto_suggest = AutoSuggestFromHistory())
+    S_ = run_state(S_, text)
+
