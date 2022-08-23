@@ -1,8 +1,6 @@
-from cProfile import run
-import re
-from lc import parser
-from lc_ast import *
-from intrinsic_function import *
+from lc_demo.lc_ast import *
+from lc_demo.lc import parser
+from lc_demo.intrinsic_function import *
 
 S = State(
     {"or": logic_or, "and": logic_and, "not": logic_not, "add": add, "sub": sub, "lt": lt, "gt": gt, "ge": ge, "le": le, "eq": eq, "div": div, "mul": mul, "mod": mod},

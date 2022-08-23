@@ -1,5 +1,5 @@
 %%
-from lc_ast import *
+from lc_demo.lc_ast import *
 def append(lst, element):
     lst.append(element)
     return lst

@@ -1,7 +1,7 @@
 # Generated from lark-action.
 
 
-from lc_ast import *
+from lc_demo.lc_ast import *
 def append(lst, element):
     lst.append(element)
     return lst
@@ -15,7 +15,7 @@ if '_get_value' not in globals():
         return token.value
 
 
-from lc_raw import Transformer, Lark_StandAlone, Tree
+from lc_demo.lc_raw import Transformer, Lark_StandAlone, Tree
 class lc_Transformer(Transformer):
 
     def start_0(self, __args):
