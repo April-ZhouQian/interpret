@@ -4,36 +4,44 @@ from numbers import Number
 import typing
 import typing_extensions
 
+
 @dataclass(frozen=True)
 class NamedFunc:
     name: str
     arg: list[str]
     body: Block
 
+
 @dataclass(frozen=True)
 class Var:
     name: str
+
 
 @dataclass(frozen=True)
 class BoolVal:
     value: bool
 
+
 @dataclass(frozen=True)
 class NumberVal:
     value: Number
 
+
 @dataclass(frozen=True)
 class StringVal:
     value: str
+
 
 @dataclass(frozen=True)
 class AssignVal:
     var: str
     value: LC
 
+
 @dataclass(frozen=True)
 class Block:
-    body:list[LC]
+    body: list[LC]
+
 
 @dataclass(frozen=True)
 class IfBlock:
@@ -41,19 +49,23 @@ class IfBlock:
     body: Block
     else_body: Block
 
+
 @dataclass(frozen=True)
 class WhileBlock:
     cond: LC
     body: Block
 
+
 @dataclass(frozen=True)
 class Return:
     body: LC
+
 
 @dataclass(frozen=True)
 class CallFunc:
     func: LC
     arg: list[LC]
+
 
 @dataclass(frozen=True)
 class BinOp:
@@ -61,10 +73,12 @@ class BinOp:
     right: LC
     op: LC
 
+
 @dataclass(frozen=True)
 class UnaryOp:
     right: LC
-    op: typing.Literal['neg', 'pos', 'not']
+    op: typing.Literal["neg", "pos", "not"]
+
 
 @dataclass(frozen=True)
 class LogicalOp:
@@ -72,47 +86,75 @@ class LogicalOp:
     right: LC
     op: LC
 
+
 @dataclass(frozen=True)
 class LogicalNot:
     right: LC
     op: LC
 
+
 if typing.TYPE_CHECKING:
-    LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp | LogicalOp | LogicalNot # type: ignore
+    LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp | LogicalOp | LogicalNot  # type: ignore
 else:
-    LC = (Var, NumberVal, BoolVal, StringVal, AssignVal, Block, NamedFunc, IfBlock, WhileBlock, Return, CallFunc, BinOp, UnaryOp, LogicalOp, LogicalNot)
+    LC = (
+        Var,
+        NumberVal,
+        BoolVal,
+        StringVal,
+        AssignVal,
+        Block,
+        NamedFunc,
+        IfBlock,
+        WhileBlock,
+        Return,
+        CallFunc,
+        BinOp,
+        UnaryOp,
+        LogicalOp,
+        LogicalNot,
+    )
+
 
 @dataclass
 class State:
-    scope:typing.Dict[str, typing.Any]
+    scope: typing.Dict[str, typing.Any]
     is_returning: bool
+
 
 def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
     if isinstance(syntactic_structure, Var):
         return S.scope[syntactic_structure.name], S
-    elif isinstance(syntactic_structure,BoolVal):
+    elif isinstance(syntactic_structure, BoolVal):
         return syntactic_structure.value, S
     elif isinstance(syntactic_structure, StringVal):
         return syntactic_structure.value, S
     elif isinstance(syntactic_structure, NumberVal):
         return syntactic_structure.value, S
     elif isinstance(syntactic_structure, NamedFunc):
+
         def rf(S_star: State, r_star):
             arg = syntactic_structure.arg
             S1 = State({**S.scope}, S.is_returning)
             r1 = None
             gap = len(r_star) - len(arg)
             if gap > 0:
-                raise Exception("Error in parameter list: " + str(gap) + " more parameters were transmitted")
+                raise Exception(
+                    "Error in parameter list: "
+                    + str(gap)
+                    + " more parameters were transmitted"
+                )
             elif gap < 0:
-                raise Exception("Error in parameter list: Missing " + str(-gap) + " parameters")
+                raise Exception(
+                    "Error in parameter list: Missing " + str(-gap) + " parameters"
+                )
             else:
                 for index in range(len(arg)):
                     S1 = State({**S1.scope, arg[index]: r_star[index]}, S1.is_returning)
                 r1, S1 = eval_lc(S1, syntactic_structure.body)
                 return r1, S_star
+
         name = syntactic_structure.name
-        if name != '':
+        if name != "":
             S = State({**S.scope, name: rf}, S.is_returning)
         return rf, S
     elif isinstance(syntactic_structure, AssignVal):
@@ -137,8 +179,8 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         return r1, S
     elif isinstance(syntactic_structure, WhileBlock):
         r1 = None
-        r, S = eval_lc(S,syntactic_structure.cond)
-        while(r):
+        r, S = eval_lc(S, syntactic_structure.cond)
+        while r:
             r1, S = eval_lc(S, syntactic_structure.body)
             r, S = eval_lc(S, syntactic_structure.cond)
         return r1, S
@@ -176,7 +218,7 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         typing_extensions.assert_never(syntactic_structure.op)
     elif isinstance(syntactic_structure, LogicalOp):
         args = []
-        left, S =eval_lc(S, syntactic_structure.left)
+        left, S = eval_lc(S, syntactic_structure.left)
         args.append(left)
         right, S = eval_lc(S, syntactic_structure.right)
         args.append(right)

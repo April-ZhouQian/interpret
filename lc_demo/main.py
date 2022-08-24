@@ -2,7 +2,6 @@ from lc_demo.lc_ast import *
 from lc_demo.lc import parser
 from lc_demo.intrinsic_function import *
 import wisepy2
-from prompt_toolkit import prompt
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers.matlab import MatlabLexer
 from prompt_toolkit import PromptSession
@@ -28,13 +27,17 @@ S = State(
         "mul": mul,
         "mod": mod,
         "printf": printf,
-        'exit': exit
+        "exit": exit,
     },
     is_returning=False,
 )
 
+
 @wisepy2.wise
 def mi(*filenames: str):
+    """This is a mi project.
+    You can give a file path to run a mi progarm or open a repl without giving a file path.
+    """
     if not filenames:
         repl(S)
         return
@@ -55,6 +58,7 @@ def run_state(S, source_code):
     print("执行结果：", r)
     return S
 
+
 def repl(S: State):
     session = PromptSession(lexer=PygmentsLexer(MatlabLexer), completer=lc_completer)
     text = ""
@@ -65,6 +69,4 @@ def repl(S: State):
             prompt_continuation=prompt_continuation,
             auto_suggest=AutoSuggestFromHistory(),
         )
-        S= run_state(S, text)
-
-
+        S = run_state(S, text)
