@@ -4,30 +4,31 @@
                        
               
   
-start : lc -> start_0                 
-lc  : lc "(" actual_params ")" -> lc_0                                                   
-    | lc "(" ")" -> lc_1                                     
-    | or -> lc_2               
-    | CNAME "=" lc -> lc_3                                             
-    | "function" "(" args ")" "{" stmts "}" -> lc_4                                                                            
-    | "function" "(" ")" "{" stmts "}" -> lc_5                                                                       
-    | "if" "(" lc ")" "{" stmts "}" -> lc_6                                                                         
-    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> lc_7                                                                                        
-    | "while" "(" lc ")" "{" stmts "}" -> lc_8                                                                    
-    | "return" lc -> lc_9                                
-    | "function" CNAME "(" args ")" "{" stmts "}" -> lc_10                                                                                        
-    | "function" CNAME "(" ")" "{" stmts "}" -> lc_11                                                                                   
+start : stmts -> start_0                           
+lc  :or -> lc_0              
+    | CNAME "=" lc -> lc_1                                             
+    | "function" "(" args ")" "{" stmts "}" -> lc_2                                                                            
+    | "function" "(" ")" "{" stmts "}" -> lc_3                                                                       
+    | "if" "(" lc ")" "{" stmts "}" -> lc_4                                                                         
+    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> lc_5                                                                                               
+    | "while" "(" lc ")" "{" stmts "}" -> lc_6                                                                    
+    | "return" lc -> lc_7                                
+    | "function" CNAME "(" args ")" "{" stmts "}" -> lc_8                                                                                        
+    | "function" CNAME "(" ")" "{" stmts "}" -> lc_9                                                                                   
 
 stmts : lc [";"] -> stmts_0                         
        | stmts lc [";"] -> stmts_1                                          
+
+call: atom "(" actual_params ")" -> call_0                                                     
+    | atom "(" ")" -> call_1                                       
 
 name : CNAME -> name_0                         
 
 args :  name -> args_0                      
        | args "," name -> args_1                                          
 
-actual_params: atom -> actual_params_0                            
-             | actual_params "," atom -> actual_params_1                                                        
+actual_params: or -> actual_params_0                          
+            | actual_params "," or -> actual_params_1                                                     
 
 or: and -> or_0              
     | or "||" and -> or_1                                                  
@@ -65,6 +66,8 @@ atom: CNAME -> atom_0
     | ESCAPED_STRING -> atom_4                                                  
     | "(" lc ")" -> atom_5                       
     | "{" stmts "}" -> atom_6                                 
+    | atom "(" actual_params ")" -> atom_7                                                     
+    | atom "(" ")" -> atom_8                                       
 %import common.WS
 %import common.ESCAPED_STRING
 %import common.CNAME

@@ -19,35 +19,35 @@ from lc_demo.lc_raw import Transformer, Lark_StandAlone, Tree
 class lc_Transformer(Transformer):
 
     def start_0(self, __args):
-        return  __args[1-1]
+        return  Block(__args[1-1])
     def lc_0(self, __args):
-        return  CallFunc(__args[1-1], __args[3-1])
-    def lc_1(self, __args):
-        return  CallFunc(__args[1-1], "")
-    def lc_2(self, __args):
         return  __args[1-1]
-    def lc_3(self, __args):
+    def lc_1(self, __args):
         return AssignVal(__args[1-1].value, __args[3-1])
-    def lc_4(self, __args):
+    def lc_2(self, __args):
         return  NamedFunc("", __args[3-1], Block(__args[6-1]))
-    def lc_5(self, __args):
+    def lc_3(self, __args):
         return  NamedFunc("", [], Block(__args[5-1]))
-    def lc_6(self, __args):
+    def lc_4(self, __args):
         return  IfBlock(__args[3-1], Block(__args[6-1]), Block([]))
-    def lc_7(self, __args):
-        return  IfBlock(__args[3-1], Block(__args[6-1]), __args[10-1])
-    def lc_8(self, __args):
+    def lc_5(self, __args):
+        return  IfBlock(__args[3-1], Block(__args[6-1]), Block(__args[10-1]))
+    def lc_6(self, __args):
         return  WhileBlock(__args[3-1], Block(__args[6-1]))
-    def lc_9(self, __args):
+    def lc_7(self, __args):
         return  Return(__args[2-1])
-    def lc_10(self, __args):
+    def lc_8(self, __args):
         return  NamedFunc(__args[2-1].value, __args[4-1], Block(__args[7-1]))
-    def lc_11(self, __args):
+    def lc_9(self, __args):
         return  NamedFunc(__args[2-1].value, [], Block(__args[6-1]))
     def stmts_0(self, __args):
         return  [__args[1-1]]
     def stmts_1(self, __args):
         return  append(__args[1-1], __args[2-1])
+    def call_0(self, __args):
+        return  CallFunc(__args[1-1], __args[3-1])
+    def call_1(self, __args):
+        return  CallFunc(__args[1-1], "")
     def name_0(self, __args):
         return  __args[1-1].value
     def args_0(self, __args):
@@ -116,6 +116,10 @@ class lc_Transformer(Transformer):
         return  __args[2-1]
     def atom_6(self, __args):
         return  Block(__args[2-1])
+    def atom_7(self, __args):
+        return  CallFunc(__args[1-1], __args[3-1])
+    def atom_8(self, __args):
+        return  CallFunc(__args[1-1], "")
 
 
 parser = Lark_StandAlone(transformer=lc_Transformer())

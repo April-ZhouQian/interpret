@@ -17,6 +17,7 @@ S = State(
 )
 def run_code(source_code):
     ast = parser.parse(source_code)
+    print(ast)
     print("执行结果：", eval_lc(S, ast)[0])
 
 def run_state(S, source_code):
@@ -30,10 +31,10 @@ S_ = S
 def prompt_continuation(width, line_number, is_soft_wrap):
     return '.' * width
 
-session = PromptSession(lexer = PygmentsLexer(MatlabLexer))
+session = PromptSession(lexer = PygmentsLexer(MatlabLexer), completer = lc_completer)
 text =""
 while True:
-    text = session.prompt('mi>>>> ', multiline=True,
+    text = session.prompt('mi> ', multiline=True,
        prompt_continuation = prompt_continuation, auto_suggest = AutoSuggestFromHistory())
     S_ = run_state(S_, text)
 

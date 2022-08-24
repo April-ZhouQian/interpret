@@ -4,15 +4,13 @@ def append(lst, element):
     lst.append(element)
     return lst
 %%
-start : lc -> $1
-lc  : lc "(" actual_params ")" -> CallFunc($1, $3)
-    | lc "(" ")" -> CallFunc($1, "")
-    | or -> $1
+start : stmts -> Block($1)
+lc  :or -> $1
     | CNAME "=" lc ->AssignVal($1.value, $3)
     | "function" "(" args ")" "{" stmts "}" -> NamedFunc("", $3, Block($6))
     | "function" "(" ")" "{" stmts "}" -> NamedFunc("", [], Block($5))
     | "if" "(" lc ")" "{" stmts "}" -> IfBlock($3, Block($6), Block([]))
-    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> IfBlock($3, Block($6), $10)
+    | "if" "(" lc ")" "{" stmts "}" "else" "{" stmts "}" -> IfBlock($3, Block($6), Block($10))
     | "while" "(" lc ")" "{" stmts "}" -> WhileBlock($3, Block($6))
     | "return" lc -> Return($2)
     | "function" CNAME "(" args ")" "{" stmts "}" -> NamedFunc($2.value, $4, Block($7))
@@ -21,13 +19,16 @@ lc  : lc "(" actual_params ")" -> CallFunc($1, $3)
 stmts : lc [";"] -> [$1]
        | stmts lc [";"] -> append($1, $2)
 
+call: atom "(" actual_params ")" -> CallFunc($1, $3)
+    | atom "(" ")" -> CallFunc($1, "")
+
 name : CNAME -> $1.value
 
 args :  name  -> [$1]
        | args "," name  -> append($1, $3)
 
-actual_params: atom -> [$1]
-             | actual_params "," atom -> append($1, $3)
+actual_params: or -> [$1]
+            | actual_params "," or -> append($1, $3)
 
 or: and -> $1
     | or "||" and -> LogicalOp($1, $3, Var("or"))
@@ -65,6 +66,8 @@ atom: CNAME    -> Var($1.value)
     | ESCAPED_STRING -> StringVal(eval($1.value))
     | "(" lc ")" -> $2
     | "{" stmts "}" -> Block($2)
+    | atom "(" actual_params ")" -> CallFunc($1, $3)
+    | atom "(" ")" -> CallFunc($1, "")
 %import common.WS
 %import common.ESCAPED_STRING
 %import common.CNAME
