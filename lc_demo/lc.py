@@ -61,15 +61,15 @@ class lc_Transformer(Transformer):
     def or_0(self, __args):
         return  __args[1-1]
     def or_1(self, __args):
-        return  LogicalOp(__args[1-1], __args[3-1], Var("or"))
+        return  LogicalOr(__args[1-1], __args[3-1])
     def and_0(self, __args):
         return  __args[1-1]
     def and_1(self, __args):
-        return  LogicalOp(__args[1-1], __args[3-1], Var("and"))
+        return  LogicalAnd(__args[1-1], __args[3-1])
     def not_0(self, __args):
         return  __args[1-1]
     def not_1(self, __args):
-        return  LogicalNot(__args[2-1], Var("not"))
+        return  LogicalNot(__args[2-1])
     def relation_0(self, __args):
         return  __args[1-1]
     def relation_1(self, __args):

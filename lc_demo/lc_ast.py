@@ -81,20 +81,23 @@ class UnaryOp:
 
 
 @dataclass(frozen=True)
-class LogicalOp:
+class LogicalOr:
     left: LC
     right: LC
-    op: LC
+
+@dataclass(frozen=True)
+class LogicalAnd:
+    left: LC
+    right: LC
 
 
 @dataclass(frozen=True)
 class LogicalNot:
     right: LC
-    op: LC
 
 
 if typing.TYPE_CHECKING:
-    LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp | LogicalOp | LogicalNot  # type: ignore
+    LC = Var | NumberVal | BoolVal | StringVal | AssignVal | Block | NamedFunc | IfBlock | WhileBlock | Return | CallFunc | BinOp | UnaryOp | LogicalOr | LogicalAnd | LogicalNot  # type: ignore
 else:
     LC = (
         Var,
@@ -110,7 +113,8 @@ else:
         CallFunc,
         BinOp,
         UnaryOp,
-        LogicalOp,
+        LogicalOr,
+        LogicalAnd,
         LogicalNot,
     )
 
@@ -216,20 +220,21 @@ def eval_lc(S: State, syntactic_structure: LC) -> tuple[typing.Any, State]:
         elif syntactic_structure.op == "not":
             return not right, S
         typing_extensions.assert_never(syntactic_structure.op)
-    elif isinstance(syntactic_structure, LogicalOp):
-        args = []
+    elif isinstance(syntactic_structure, LogicalOr):
         left, S = eval_lc(S, syntactic_structure.left)
-        args.append(left)
+        if left:
+            return True, S
         right, S = eval_lc(S, syntactic_structure.right)
-        args.append(right)
-        rf, S1 = eval_lc(S, syntactic_structure.op)
-        r, S2 = rf(S1, args)
-        return r, S2
+        return right, S
+    elif isinstance(syntactic_structure, LogicalAnd):
+        left, S = eval_lc(S, syntactic_structure.left)
+        if not left:
+            return False, S
+        right, S = eval_lc(S, syntactic_structure.right)
+        return right, S
     elif isinstance(syntactic_structure, LogicalNot):
         right, S = eval_lc(S, syntactic_structure.right)
-        rf, S1 = eval_lc(S, syntactic_structure.op)
-        r, S2 = rf(S1, right)
-        return r, S2
+        return not right, S
     if typing.TYPE_CHECKING:
         typing_extensions.assert_never(syntactic_structure)
     else:
